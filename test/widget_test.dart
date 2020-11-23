@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:widget_test/Album.dart';
+import 'package:widget_test/AlbumPage.dart';
 import 'package:widget_test/MyProvider.dart';
 import 'package:widget_test/MyRepository.dart';
 
@@ -16,7 +18,7 @@ import 'package:widget_test/main.dart';
 
 class MockRepository  extends Mock implements CounterRepository{}
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Counter increments smoke test with Provider', (WidgetTester tester) async {
     // Build our app and trigger a frame.
    var counterRepository = MockRepository();
    when(counterRepository.increment(0)).thenReturn(1);
@@ -46,5 +48,37 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  testWidgets('Test provider with network call',(WidgetTester tester) async {
+    var repository = MockRepository();
+    when(repository.loadAlbum()).thenAnswer((realInvocation) async => Album(userId: 1,id: 1,title: 'Good Bye'));
+
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CounterProvider>(create: (context) => CounterProvider(repository))
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: AlbumPage()
+      ),
+    ));
+
+    // Verify that our counter starts at 0.
+    expect(find.text('Hello'), findsOneWidget);
+    expect(find.text('Good Bye'), findsNothing);
+
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.network_check));
+    await tester.pump();
+
+    // Verify that our counter has incremented.
+    expect(find.text('Hello'), findsNothing);
+    expect(find.text('Good Bye'), findsOneWidget);
+
   });
 }

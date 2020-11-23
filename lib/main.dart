@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:widget_test/MyProvider.dart';
 import 'package:widget_test/MyRepository.dart';
 
+import 'AlbumPage.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: AlbumPage()
       ),
     );
   }
